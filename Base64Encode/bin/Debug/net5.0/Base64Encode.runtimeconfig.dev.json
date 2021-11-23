@@ -1,8 +1,0 @@
-{
-  "runtimeOptions": {
-    "additionalProbingPaths": [
-      "C:\\Users\\fruta\\.dotnet\\store\\|arch|\\|tfm|",
-      "C:\\Users\\fruta\\.nuget\\packages"
-    ]
-  }
-}
