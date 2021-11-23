@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "E63Z7XvaIOhQcu7oCugOurPcG4qbyq12tCbQnH2bNW3FIK3+7EGju3mTSZEveKPFZE8nmJc9RNOUWExe5gcjnQ==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\fruta\\source\\repos\\Base64Encode\\Base64Encode\\Base64Encode.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\fruta\\.nuget\\packages\\commandlineparser\\2.8.0\\commandlineparser.2.8.0.nupkg.sha512"
+  ],
+  "logs": []
+}
