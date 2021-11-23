@@ -8,6 +8,9 @@ namespace Base64Encode
 {
     class Program
     {
+        // Buffer size must be multiple of 6 and 8 in face of the nature of base64 encoding.
+        const int BufferSize = 1200;
+
         static async Task<int> Main(string[] args)
         {
             return await Parser
@@ -17,56 +20,77 @@ namespace Base64Encode
                 {
                     try
                     {
+                        ValidateBufferSize(BufferSize);
+
                         if (string.IsNullOrEmpty(opts.Data) && string.IsNullOrEmpty(opts.Input))
                         {
                             Console.WriteLine("You must specify a file path with -i <path> or a text to convert.");
                             return -1;
                         }
 
-                        string result;
                         if (!string.IsNullOrEmpty(opts.Input))
-                        {
-                            // Buffer size must be multiple of 3 in face of the nature of base64 encoding.
-                            var bufferSize = 900;
-                            var buffer = new char[bufferSize];
-                            using (var fs = new FileStream(opts.Input, FileMode.Open, FileAccess.Read))
-                            using (var reader = new StreamReader(fs))
-                            {
-                                int readChars;
-                                do
-                                {
-                                    readChars = await reader.ReadAsync(buffer, 0, buffer.Length);
-                                    var text = string.Concat(buffer).Substring(0, readChars);
-
-                                    if (string.IsNullOrEmpty(opts.Output))
-                                        Console.Write(Base64Handler.Encode(text));
-                                    else
-                                        return 1;
-                                } while (readChars != 0);
-                            }
-                        }
+                            await ReadFromFileAndWriteToConsole(opts);
                         else
-                        {
-                            if (opts.Decode)
-                                result = Base64Handler.Decode(opts.Data);
-                            else if (opts.Encode)
-                                result = Base64Handler.Encode(opts.Data);
-                            else
-                            {
-                                Console.WriteLine("You must specify it the text is going to be encoded with -e or decoded with -d.");
-                                return -1;
-                            }
-                        }
+                            return ProcessDataAndWriteToConsole(opts);
 
                         return 1;
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Error: {ex.Message}");
+                        Console.WriteLine(ex.Message);
                         return -3; // Unhandled error
                     }
                 },
                 errs => Task.FromResult(-1)); // Invalid arguments
+        }
+
+        static void ValidateBufferSize(int bufferSize)
+        {
+            if (bufferSize % 6 != 0 || bufferSize % 8 != 0)
+                throw new Exception($"Invalid buffer size: {bufferSize} B.");
+        }
+
+        static async Task<int> ReadFromFileAndWriteToConsole(CommandLineOptions opts)
+        {
+            var buffer = new char[BufferSize];
+            using (var reaferFs = new FileStream(opts.Input, FileMode.Open, FileAccess.Read))
+            using (var reader = new StreamReader(reaferFs))
+            {
+                int readChars;
+                do
+                {
+                    readChars = await reader.ReadAsync(buffer, 0, buffer.Length);
+                    var text = string.Concat(buffer).Substring(0, readChars);
+
+                    if (string.IsNullOrEmpty(opts.Output))
+                    {
+                        ProcessDataAndWriteToConsole(opts);
+                    }
+                    else
+                    {
+                        using (var writerFs = new FileStream(opts.Output, FileMode.OpenOrCreate, FileAccess.Write))
+                        using (var writer = new StreamWriter(writerFs))
+                        {
+                            if (opts.Decode)
+                                await writer.WriteAsync(Base64Handler.Decode(text));
+                            else
+                                await writer.WriteAsync(Base64Handler.Encode(text));
+                        }
+                            return 1;
+                    }
+                } while (readChars != 0);
+            }
+
+            return 1;
+        }
+
+        static int ProcessDataAndWriteToConsole(CommandLineOptions opts)
+        {
+            if (opts.Decode)
+                Console.WriteLine(Base64Handler.Decode(opts.Data));
+            else
+                Console.WriteLine(Base64Handler.Encode(opts.Data));
+            return 0;
         }
     }
 }

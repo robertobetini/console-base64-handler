@@ -8,8 +8,6 @@ namespace Base64Encode
         public string Data { get; set; }
         [Option(shortName: 'd', longName: "decode", HelpText = "Decode to base64.")]
         public bool Decode { get; set; }
-        [Option(shortName: 'e', longName: "encode", HelpText = "Encode to base64.")]
-        public bool Encode { get; set; }
         [Option(shortName: 'i', longName: "input", HelpText = "File to convert.")]
         public string Input { get; set; }
         [Option(shortName: 'o', longName: "output", HelpText = "Output path of converted file.")]
