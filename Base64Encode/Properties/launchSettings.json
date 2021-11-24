@@ -1,7 +1,8 @@
 {
   "profiles": {
     "Base64Encode": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "-i testeth.txt"
     }
   }
 }

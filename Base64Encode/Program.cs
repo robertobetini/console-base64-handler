@@ -9,7 +9,7 @@ namespace Base64Encode
     class Program
     {
         // Buffer size must be multiple of 6 and 8 in face of the nature of base64 encoding.
-        const int BufferSize = 1200;
+        const int BUFFER_SIZE = 1200;
 
         static async Task<int> Main(string[] args)
         {
@@ -20,7 +20,7 @@ namespace Base64Encode
                 {
                     try
                     {
-                        ValidateBufferSize(BufferSize);
+                        ValidateBufferSize(BUFFER_SIZE);
 
                         if (string.IsNullOrEmpty(opts.Data) && string.IsNullOrEmpty(opts.Input))
                         {
@@ -31,7 +31,7 @@ namespace Base64Encode
                         if (!string.IsNullOrEmpty(opts.Input))
                             await ReadFromFileAndWriteToConsole(opts);
                         else
-                            return ProcessDataAndWriteToConsole(opts);
+                            return ProcessDataAndWriteToConsole(opts.Data, opts.Decode);
 
                         return 1;
                     }
@@ -52,7 +52,7 @@ namespace Base64Encode
 
         static async Task<int> ReadFromFileAndWriteToConsole(CommandLineOptions opts)
         {
-            var buffer = new char[BufferSize];
+            var buffer = new char[BUFFER_SIZE];
             using (var reaferFs = new FileStream(opts.Input, FileMode.Open, FileAccess.Read))
             using (var reader = new StreamReader(reaferFs))
             {
@@ -64,7 +64,7 @@ namespace Base64Encode
 
                     if (string.IsNullOrEmpty(opts.Output))
                     {
-                        ProcessDataAndWriteToConsole(opts);
+                        ProcessDataAndWriteToConsole(text, opts.Decode);
                     }
                     else
                     {
@@ -84,12 +84,12 @@ namespace Base64Encode
             return 1;
         }
 
-        static int ProcessDataAndWriteToConsole(CommandLineOptions opts)
+        static int ProcessDataAndWriteToConsole(string text, bool isDecode)
         {
-            if (opts.Decode)
-                Console.WriteLine(Base64Handler.Decode(opts.Data));
+            if (isDecode)
+                Console.WriteLine(Base64Handler.Decode(text));
             else
-                Console.WriteLine(Base64Handler.Encode(opts.Data));
+                Console.WriteLine(Base64Handler.Encode(text));
             return 0;
         }
     }
